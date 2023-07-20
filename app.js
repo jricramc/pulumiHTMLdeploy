@@ -59,7 +59,7 @@ app.post('/v1/code', async (req, res) => {
     const { content, projectName, stackName } = req.body;
     const pulumiAccessToken = req.headers.pulumi_access_token;
     // const htmlResponse = req.body.content;
-    process.env.PULUMI_ACCESS_TOKEN = pulumiAccessToken;
+    // process.env.PULUMI_ACCESS_TOKEN = undefined;
     const program = () => pulumiProgram(content);
     try {
         const stack = await LocalWorkspace.createStack({
