@@ -17,6 +17,7 @@ const pulumiProgram = async (content) => {
             indexDocument: "index.html",
         },
     });
+    console.log('sitenucket',siteBucket)
 
     const bucketPublicAccessBlock = new aws.s3.BucketPublicAccessBlock("bucketPublicAccessBlock", {
         bucket: siteBucket.id,
@@ -25,6 +26,8 @@ const pulumiProgram = async (content) => {
         ignorePublicAcls: false,
         restrictPublicBuckets: false,
     });
+    console.log('bucketPublicAccessBlock',bucketPublicAccessBlock)
+
 
     const bucketPolicy = new aws.s3.BucketPolicy("bucketPolicy", {
         bucket: siteBucket.id,
@@ -39,6 +42,8 @@ const pulumiProgram = async (content) => {
         })),
         dependsOn: [bucketPublicAccessBlock], // Wait for bucketPublicAccessBlock to finish
     });
+    console.log('bucketPolicy',bucketPolicy)
+
 
     new aws.s3.BucketObject("index", {
         bucket: siteBucket.id,
@@ -46,6 +51,8 @@ const pulumiProgram = async (content) => {
         key: "index.html",
         contentType: "text/html; charset=utf-8",
     });
+    return { websiteUrl: pulumi.interpolate `http://${siteBucket.id}.s3-website.us-east-2.amazonaws.com` };
+    // return { websiteUrl: siteBucket.websiteEndpoint };
 }
 
 
@@ -70,7 +77,13 @@ app.post('/v1/code', async (req, res) => {
         await stack.workspace.installPlugin("aws", "v4.0.0");
         await stack.setConfig("aws:region", { value: "us-east-2" });
         const upRes = await stack.up({ onOutput: console.log });
-        res.json({ id: stackName, url: upRes.outputs.websiteUrl });
+        // const websiteUrlValue = await upRes.outputs.websiteUrl.promise();
+        res.status(200).json({ id: stackName, upRes });
+
+
+
+
+
     } catch (error) {
         if (error.message.includes('already exists')) {
             res.status(409).send(`stack '${stackName}' already exists`);
@@ -81,5 +94,5 @@ app.post('/v1/code', async (req, res) => {
     }
 });
 
-app.listen(3005, () => console.log('Server running on port 3000'));
+app.listen(3004, () => console.log('Server running on port 3000'));
 
