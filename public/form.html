@@ -55,6 +55,26 @@
         input[type="submit"]:hover {
             background-color: #e64a19;
         }
+
+        #result {
+            max-width: 400px;
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #333333;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        #result a {
+            color: #ff5722;
+            text-decoration: none;
+        }
+
+        #result a:hover {
+            text-decoration: underline;
+        }
     </style>
     <script>
         async function submitForm(event) {
@@ -77,11 +97,22 @@
                     stackName: stackName
                 })
             });
+            // console.log(response)
 
             const result = await response.json();
+            console.log(result)
+            const resultDiv = document.getElementById('result');
 
-            if (response.ok) {
-                alert('Website deployed at URL: ' + result.url);
+            if (response) {
+                const url = result.upRes.outputs.websiteUrl.value;
+                console.log(url)
+                resultDiv.textContent = 'Website deployed at URL: ';
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.textContent = url;
+                resultDiv.appendChild(link);
+                alert('Website deployed at URL: ' + url);
             } else {
                 alert('Error: ' + result.message);
             }
@@ -100,5 +131,6 @@
         <input type="text" id="pulumiAccessToken" name="pulumiAccessToken">
         <input type="submit" value="Deploy">
     </form>
+    <div id="result"></div>
 </body>
 </html>
