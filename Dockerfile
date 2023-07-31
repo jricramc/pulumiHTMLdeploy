@@ -17,4 +17,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 3005
-CMD [ "node", "app.js" ]
+CMD [ "node", "add.js" ]
